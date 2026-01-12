@@ -5,8 +5,55 @@
 #include <algorithm>
 using namespace std;
 
+struct RoundStats {
+  double wpm;
+  double accuracy;
+  double time;
+};
+
+void printRoundStats(vector<RoundStats>& allRounds) {
+  if(!allRounds.empty()) {
+    cout<<"==========Overall Stats=========="<<endl;
+    double totalWPM = 0, totalAccuracy = 0;
+    for(auto& it: allRounds) {
+      totalWPM += it.wpm;
+      totalAccuracy += it.accuracy;
+    }
+    cout<<"Total Rounds: "<<allRounds.size()<<endl;
+    cout<<"Total Accuracy: "<<totalAccuracy / allRounds.size() <<endl;
+    cout<<"Total Words Per Minute: "<<totalWPM / allRounds.size() <<endl;
+    cout<<"Thank you for playing!!!"<<endl;
+    cout<<endl<<endl;
+  }
+}
+
+RoundStats playRound(vector<string>& sentences) {
+  RoundStats stats;
+
+  int randomIndex = rand() % sentences.size();
+
+  string random_sentence = sentences[randomIndex];
+  cout<<random_sentence<<endl;
+  string user_input;
+  time_t start = time(0);
+
+  getline(cin,user_input);
+  time_t end = time(0);
+  int correctChars = 0;
+  int totalChars = random_sentence.length();
+  for(int i = 0; i<totalChars; i++) {
+    if(i<user_input.length() && random_sentence[i] == user_input[i]) {
+      correctChars++;
+    }
+  }
+  stats.accuracy = (correctChars * 100.0) / totalChars;
+  stats.time = difftime(end,start);
+  stats.wpm = (correctChars/5) / (stats.time/60);
+ return stats; 
+}
+
 int main() {
-    // 1. Store some sample sentences in a vector
+  srand(time(0));
      
     vector<string> sentences = {
         "the quick brown fox jumps over the lazy dog",
@@ -35,37 +82,26 @@ int main() {
         "code reviews help teams share knowledge",
         "technical debt accumulates without regular maintenance"
     };
-    // 2. Pick random sentence (use rand() with current time as seed)
-    srand(time(0));
+    vector<RoundStats> allRounds;
 
-    int randomIndex = rand() % sentences.size();
+    char continueRound = 'y';
 
-    string random_sentence = sentences[randomIndex];
-    // 3. Display it and wait for user input
-    cout<<random_sentence<<endl;
-    string user_input;
-    // 4. Record start time (use time() or clock())
-    time_t start = time(0);
+    while(true) {
+    
+      if(tolower(continueRound) != 'y') break;
+      else {      
+      RoundStats stats = playRound(sentences);
+      allRounds.push_back(stats);
 
-    // 5. Get user input
-    getline(cin,user_input);
-    // 6. Record end time and calculate difference
-    time_t end = time(0);
-    // 7. Compare strings character by character for accuracy
-    int correctChars = 0;
-    int totalChars = random_sentence.length();
-    for(int i = 0; i<totalChars; i++) {
-      if(i<user_input.length() && random_sentence[i] == user_input[i]) {
-        correctChars++;
+      cout<<"Accuracy: "<<stats.accuracy<<endl;
+      cout<<"Words per minute: "<<stats.wpm<<endl;
+      cout<<endl<<endl;
+      cout<<"Do you want to continue? (y/n) "<<endl;
+      cin>>continueRound;
+      cin.ignore();
+      cout<<endl<<endl;
       }
     }
-
-    double accuracy = (correctChars * 100.0) / totalChars;
-    cout<<"accuracy: "<<accuracy<<endl;
-    // 8. Calculate WPM = (characters / 5) / (seconds / 60)
-    double seconds_taken = difftime(end,start);
-    double wpm = (correctChars/5) / (seconds_taken/60);
-    // 9. Display results!
-    cout<<"words per minute: "<<wpm<<endl;
-    return 0;
+    printRoundStats(allRounds);
+   return 0;
 }
