@@ -5,11 +5,41 @@
 #include <algorithm>
 using namespace std;
 
+// ANSI color codes
+const string RESET = "\033[0m";
+const string RED = "\033[31m";
+const string GREEN = "\033[32m";
+const string YELLOW = "\033[33m";
+const string CYAN = "\033[36m";
+
 struct RoundStats {
   double wpm;
   double accuracy;
   double time;
 };
+
+
+void showMistakes(string original, string typed) {
+  int maxLength = max(original.length(), typed.length());
+  bool hasMistakes = false;
+  for(int i=0; i<maxLength; i++) {
+    if(i >= original.length() || i >= typed.length() || original[i] != typed[i]) {
+      hasMistakes = true;
+      break;
+    }
+  }
+  if(hasMistakes) {
+    cout<<"\n\nMistakes: "<<typed<<endl;
+    cout<<"          ";
+    for(int i=0; i<maxLength; i++) {
+      if(i >= typed.length()) cout<<"^";
+      else if(i >= original.length()) cout<<"^";
+      else if(original[i] != typed[i]) cout<<"^";
+      else cout<<" ";
+    }
+    cout<<endl;
+  }
+}
 
 void printRoundStats(vector<RoundStats>& allRounds) {
   if(!allRounds.empty()) {
@@ -49,6 +79,7 @@ RoundStats playRound(vector<string>& sentences) {
   stats.accuracy = (correctChars * 100.0) / totalChars;
   stats.time = difftime(end,start);
   stats.wpm = (correctChars/5) / (stats.time/60);
+  showMistakes(random_sentence, user_input);
  return stats; 
 }
 
