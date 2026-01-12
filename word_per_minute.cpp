@@ -29,13 +29,13 @@ void showMistakes(string original, string typed) {
     }
   }
   if(hasMistakes) {
-    cout<<"\n\nMistakes: "<<typed<<endl;
-    cout<<"          ";
-    for(int i=0; i<maxLength; i++) {
-      if(i >= typed.length()) cout<<"^";
-      else if(i >= original.length()) cout<<"^";
-      else if(original[i] != typed[i]) cout<<"^";
-      else cout<<" ";
+    cout<<"You typed: ";
+    for(int i=0; i<typed.length(); i++) {
+      if(i < original.length() && original[i] == typed[i]) {
+        cout<<GREEN<<typed[i]<<RESET;
+      } else {
+        cout<<RED<<typed[i]<<RESET;
+      }
     }
     cout<<endl;
   }
@@ -50,12 +50,53 @@ void printRoundStats(vector<RoundStats>& allRounds) {
       totalAccuracy += it.accuracy;
     }
     cout<<"Total Rounds: "<<allRounds.size()<<endl;
-    cout<<"Total Accuracy: "<<totalAccuracy / allRounds.size() <<endl;
-    cout<<"Total Words Per Minute: "<<totalWPM / allRounds.size() <<endl;
+    double finalAccuracy = totalAccuracy / allRounds.size();
+    if(finalAccuracy == 100) {
+      cout<<GREEN<<"Total Accuracy: "<<finalAccuracy<<"%"<<RESET<<endl;
+    } else if(finalAccuracy >= 90) {
+      cout<<YELLOW<<"Total Accuracy: "<<finalAccuracy<<"%"<<RESET<<endl;
+    } else {
+      cout<<RED<<"Total Accuracy: "<<finalAccuracy<<"%"<<RESET<<endl;
+    }
+
+    double finalwpm = totalWPM / allRounds.size();
+    if(finalwpm >= 60) {
+      cout<<GREEN<<"Total words per minute: "<<finalwpm<<RESET<<endl;
+     } else if(finalwpm >= 40) {
+      cout<<YELLOW<<"Total words per minute: "<<finalwpm<<RESET<<endl;
+      } else {
+      cout<<RED<<"Total words per minute: "<<finalwpm<<RESET<<endl;
+    }
+
     cout<<"Thank you for playing!!!"<<endl;
     cout<<endl<<endl;
   }
 }
+
+void showAccuracy(RoundStats& stats) {
+
+  if(stats.accuracy == 100) {
+    cout<<GREEN<<"Accuracy: "<<stats.accuracy<<"%"<<RESET<<endl;
+  } else if(stats.accuracy <= 90) {
+    cout<<YELLOW<<"Accuracy: "<<stats.accuracy<<"%"<<RESET<<endl;
+  } else {
+    cout<<RED<<"Accuracy: "<<stats.accuracy<<"%"<<RESET<<endl;
+  }
+}
+
+
+
+void showWPM(RoundStats& stats) {
+  if(stats.wpm >= 60) {
+    cout<<GREEN<<"Words per minute: "<<stats.wpm<<RESET<<endl;
+  } else if(stats.wpm >= 40) {
+    cout<<YELLOW<<"Words per minute: "<<stats.wpm<<RESET<<endl;
+  } else {
+    cout<<RED<<"Words per minute: "<<stats.wpm<<RESET<<endl;
+  }
+}
+
+
 
 RoundStats playRound(vector<string>& sentences) {
   RoundStats stats;
@@ -124,8 +165,8 @@ int main() {
       RoundStats stats = playRound(sentences);
       allRounds.push_back(stats);
 
-      cout<<"Accuracy: "<<stats.accuracy<<endl;
-      cout<<"Words per minute: "<<stats.wpm<<endl;
+      showAccuracy(stats);
+      showWPM(stats);
       cout<<endl<<endl;
       cout<<"Do you want to continue? (y/n) "<<endl;
       cin>>continueRound;
